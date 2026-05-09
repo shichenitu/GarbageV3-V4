@@ -60,3 +60,4 @@ The app helps users identify the correct disposal methods for various items, tra
 ## Resources
 - **Copenhagen Open Data API:** Used for fetching real-time recycling station locations.
 - **Icons:** Material Icons Extended.
+
