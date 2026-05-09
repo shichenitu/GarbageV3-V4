@@ -53,6 +53,7 @@ private fun SettingsScreen(
     uiEvents: SettingsViewModel.UiEvents
 ) {
     var expanded by remember { mutableStateOf(value = false) }
+    var languageExpanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -110,6 +111,58 @@ private fun SettingsScreen(
                             onClick = {
                                 uiEvents.onSetTheme(theme)
                                 expanded = false
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(id = R.string.language_label),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            ExposedDropdownMenuBox(
+                expanded = languageExpanded,
+                onExpandedChange = { languageExpanded = !languageExpanded }
+            ) {
+                val currentLanguageText = when (uiState.currentLanguage) {
+                    SettingsViewModel.AppLanguage.ENGLISH -> "English"
+                    SettingsViewModel.AppLanguage.DANISH -> "Dansk"
+                }
+
+                TextField(
+                    value = currentLanguageText,
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
+                    modifier = Modifier.menuAnchor(
+                        type = MenuAnchorType.PrimaryNotEditable,
+                        enabled = true
+                    )
+                )
+
+                ExposedDropdownMenu(
+                    expanded = languageExpanded,
+                    onDismissRequest = { languageExpanded = false }
+                ) {
+                    SettingsViewModel.AppLanguage.entries.forEach { language ->
+                        val itemLanguageText = when (language) {
+                            SettingsViewModel.AppLanguage.ENGLISH -> "English"
+                            SettingsViewModel.AppLanguage.DANISH -> "Dansk"
+                        }
+
+                        DropdownMenuItem(
+                            text = { Text(text = itemLanguageText) },
+                            onClick = {
+                                uiEvents.onSetLanguage(language)
+                                languageExpanded = false
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                         )
