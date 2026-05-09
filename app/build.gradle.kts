@@ -84,4 +84,5 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("androidx.compose.material:material-icons-extended:1.7.0")
     implementation(libs.play.services.location)
+    implementation("androidx.appcompat:appcompat:1.6.1")
 }

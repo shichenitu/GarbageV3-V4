@@ -12,35 +12,63 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
+    private fun getCurrentAppLanguage(): AppLanguage {
+        val locales = AppCompatDelegate.getApplicationLocales()
+        val currentTag = if (locales.isEmpty) {
+            "en"
+        } else {
+            locales.get(0)?.language ?: "en"
+        }
+
+        return AppLanguage.entries.find { it.tag == currentTag } ?: AppLanguage.ENGLISH
+    }
+
     val uiState: StateFlow<UiState> = userPreferencesRepository.theme
-        .map { UiState(it) }
+        .map { theme ->
+            UiState(
+                theme = theme,
+                currentLanguage = getCurrentAppLanguage()
+            ) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
-            initialValue = UiState()
+            initialValue = UiState(currentLanguage = getCurrentAppLanguage())
         )
 
     val uiEvents: UiEvents = object : UiEvents {
         override fun onSetTheme(theme: Theme) {
-            // TODO: Save the theme to the DataStore
             viewModelScope.launch {
                 userPreferencesRepository.setTheme(theme)
             }
         }
+
+        override fun onSetLanguage(language: AppLanguage) {
+            val localeList = LocaleListCompat.forLanguageTags(language.tag)
+            AppCompatDelegate.setApplicationLocales(localeList)
+        }
+    }
+
+    enum class AppLanguage(val tag: String) {
+        ENGLISH("en"),
+        DANISH("da")
     }
 
     data class UiState(
-        val theme: Theme = Theme.SYSTEM
+        val theme: Theme = Theme.SYSTEM,
+        val currentLanguage: AppLanguage = AppLanguage.ENGLISH
     )
 
     @Immutable
     interface UiEvents {
         fun onSetTheme(theme: Theme)
+        fun onSetLanguage(language: AppLanguage)
     }
 }
