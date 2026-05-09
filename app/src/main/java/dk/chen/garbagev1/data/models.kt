@@ -13,7 +13,8 @@ import kotlinx.serialization.Serializable
 data class ItemDto(
     val id: String = UUID.randomUUID().toString(),
     val what: String = "",
-    val where: String = ""
+    val where: String = "",
+    val photoPath: String? = null
 )
 
 @Serializable
@@ -104,5 +105,6 @@ fun BinDto.toBin(): Bin = Bin(
 fun ItemDto.toItem(): Item = Item(
     id = this.id,
     what = this.what,
-    where = this.where
+    where = this.where,
+    photoPath = this.photoPath
 )

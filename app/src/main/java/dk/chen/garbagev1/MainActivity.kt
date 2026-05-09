@@ -1,6 +1,5 @@
 package dk.chen.garbagev1
 
-import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -27,6 +26,7 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import android.os.LocaleList
 import android.content.res.Configuration
+import android.os.Bundle
 import android.util.Log
 
 @AndroidEntryPoint

@@ -1,15 +1,10 @@
 package dk.chen.garbagev1.ui.features.garbage
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -27,26 +21,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import dk.chen.garbagev1.R
@@ -61,8 +49,6 @@ import dk.chen.garbagev1.ui.navigation.AppRoute
 import dk.chen.garbagev1.ui.navigation.NestedGraph
 import dk.chen.garbagev1.ui.theme.theme.GarbageV1Theme
 import kotlinx.serialization.Serializable
-import java.io.File
-import android.Manifest
 
 @Serializable
 object GarbageGraph : NestedGraph {
@@ -126,8 +112,6 @@ private fun GarbageListScreen(
                 .fillMaxSize()
                 .padding(paddingValues = contentPadding)
         ) {
-            BinPhotoSection(modifier = Modifier.padding(16.dp))
-
             LazyColumn(
                 modifier = Modifier.weight(1f)
             ) {
@@ -144,9 +128,10 @@ private fun GarbageListScreen(
         }
     }
 
-    uiState.selectedItem?.let {
+    val selectedItem = uiState.selectedItem
+    if (selectedItem != null) {
         DetailsSheet(
-            item = it,
+            item = selectedItem,
             isWhatError = uiState.isWhatError,
             isWhereError = uiState.isWhereError,
             showDeleteConfirmation = uiState.showDeleteConfirmation,
@@ -183,9 +168,12 @@ private fun ListItem(item: Item, imageUrl: String?, binColor: Color?, onItemClic
 
             // TODO Add shop logo
             AsyncImage(
-                model = imageUrl,
+                model = item.photoPath ?: imageUrl,
                 contentDescription = "Bin Logo",
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
                 placeholder = painterResource(R.drawable.ic_launcher_foreground),
                 error = painterResource(R.drawable.ic_launcher_background)
             )
@@ -216,6 +204,7 @@ fun GarbageListScreenPreview(@PreviewParameter(provider = ItemOrNullProvider::cl
             uiEvents = object : GarbageListViewModel.UiEvents {
                 override fun onWhatChange(what: String) {}
                 override fun onWhereChange(where: String) {}
+                override fun onPhotoCaptured(path: String) {}
                 override fun onSaveClick(): Boolean {
                     return true
                 }
@@ -231,74 +220,3 @@ fun GarbageListScreenPreview(@PreviewParameter(provider = ItemOrNullProvider::cl
     }
 }
 
-
-@Composable
-fun BinPhotoSection(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var tempUri by remember { mutableStateOf<Uri?>(null) }
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            imageUri = tempUri
-        }
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            val file = File(context.cacheDir, "garbage_memo_${System.currentTimeMillis()}.jpg")
-            val uri = FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.provider",
-                file
-            )
-            tempUri = uri
-            cameraLauncher.launch(uri)
-        }
-    }
-
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        if (imageUri != null) {
-            AsyncImage(
-                model = imageUri,
-                contentDescription = stringResource(R.string.garbage_memo),
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            TextButton(onClick = { imageUri = null }) {
-                Text("Clear Photo", color = MaterialTheme.colorScheme.error)
-            }
-        } else {
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = stringResource(R.string.snap_a_memo),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) }) {
-                        Text(stringResource(R.string.take_a_photo))
-                    }
-                }
-            }
-        }
-    }
-}
