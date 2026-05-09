@@ -7,7 +7,8 @@ import dk.chen.garbagev1.domain.Theme
 import dk.chen.garbagev1.domain.UserPreferencesRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.annotation.concurrent.Immutable
@@ -31,17 +32,20 @@ class SettingsViewModel @Inject constructor(
         return AppLanguage.entries.find { it.tag == currentTag } ?: AppLanguage.ENGLISH
     }
 
-    val uiState: StateFlow<UiState> = userPreferencesRepository.theme
-        .map { theme ->
-            UiState(
-                theme = theme,
-                currentLanguage = getCurrentAppLanguage()
-            ) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
-            initialValue = UiState(currentLanguage = getCurrentAppLanguage())
+    val uiState: StateFlow<UiState> = combine(
+        userPreferencesRepository.theme,
+        userPreferencesRepository.language
+    ) { theme, languageTag ->
+        val appLanguage = AppLanguage.entries.find { it.tag == languageTag } ?: AppLanguage.ENGLISH
+        UiState(
+            theme = theme,
+            currentLanguage = appLanguage
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+        initialValue = UiState()
+    )
 
     val uiEvents: UiEvents = object : UiEvents {
         override fun onSetTheme(theme: Theme) {
@@ -53,6 +57,9 @@ class SettingsViewModel @Inject constructor(
         override fun onSetLanguage(language: AppLanguage) {
             val localeList = LocaleListCompat.forLanguageTags(language.tag)
             AppCompatDelegate.setApplicationLocales(localeList)
+            viewModelScope.launch {
+                userPreferencesRepository.setLanguage(language.tag)
+            }
         }
     }
 

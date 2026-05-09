@@ -32,7 +32,8 @@ import dk.chen.garbagev1.ui.components.ThemedPreviews
 import dk.chen.garbagev1.ui.navigation.AppRoute
 import dk.chen.garbagev1.ui.theme.theme.GarbageV1Theme
 import kotlinx.serialization.Serializable
-
+import android.app.Activity
+import androidx.activity.compose.LocalActivity
 
 @Serializable
 object Settings : AppRoute
@@ -54,6 +55,7 @@ private fun SettingsScreen(
 ) {
     var expanded by remember { mutableStateOf(value = false) }
     var languageExpanded by remember { mutableStateOf(false) }
+    val activity = LocalActivity.current
 
     Column(
         modifier = Modifier
@@ -64,7 +66,7 @@ private fun SettingsScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -111,6 +113,7 @@ private fun SettingsScreen(
                             onClick = {
                                 uiEvents.onSetTheme(theme)
                                 expanded = false
+                                activity?.recreate()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                         )
@@ -163,6 +166,7 @@ private fun SettingsScreen(
                             onClick = {
                                 uiEvents.onSetLanguage(language)
                                 languageExpanded = false
+                                activity?.recreate()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                         )
@@ -177,6 +181,12 @@ private fun SettingsScreen(
 @Composable
 private fun SettingsScreenPreview() {
     GarbageV1Theme {
-        SettingsScreen()
+        SettingsScreen(
+            uiState = SettingsViewModel.UiState(),
+            uiEvents = object : SettingsViewModel.UiEvents {
+                override fun onSetTheme(theme: Theme) {}
+                override fun onSetLanguage(language: SettingsViewModel.AppLanguage) {}
+            }
+        )
     }
 }
