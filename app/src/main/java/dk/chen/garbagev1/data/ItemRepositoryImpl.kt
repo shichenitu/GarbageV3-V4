@@ -75,7 +75,8 @@ class ItemRepositoryImpl @Inject constructor(
     private fun Item.toDto() = ItemDto(
         id = this.id,
         what = this.what,
-        where = this.where
+        where = this.where,
+        photoPath = this.photoPath
     )
 
     private fun String.toTitleCase(): String {

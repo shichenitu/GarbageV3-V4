@@ -8,7 +8,8 @@ import java.util.UUID
 data class Item(
     val id: String = UUID.randomUUID().toString(),
     val what: String,
-    val where: String
+    val where: String,
+    val photoPath: String? = null
 )
 
 data class Bin(
@@ -35,7 +36,7 @@ data class RecyclingStation(
     val longitude: Double,
 )
 
-fun Item.toDto(): ItemDto = ItemDto(id = this.id, what = this.what, where = this.where)
+fun Item.toDto(): ItemDto = ItemDto(id = this.id, what = this.what, where = this.where, photoPath = this.photoPath)
 fun Bin.toDto(): BinDto = BinDto(name = this.name, imageUrl = this.imageUrl, binColor = this.binColor.value.toString())
 
 fun Item.fullDescription(): String = "${this.what.lowercase()} should be placed in: ${this.where}"

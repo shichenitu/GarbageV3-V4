@@ -73,6 +73,10 @@ class GarbageListViewModel @Inject constructor(
             _uiState.update { it.copy(selectedItem = it.selectedItem?.copy(where = where)) }
         }
 
+        override fun onPhotoCaptured(path: String) {
+            _uiState.update { it.copy(selectedItem = it.selectedItem?.copy(photoPath = path)) }
+        }
+
         override fun onUpClick() {
             viewModelScope.launch {
                 _navigationEvents.emit(value = NavigationEvent.NavigateUp)
@@ -151,6 +155,7 @@ class GarbageListViewModel @Inject constructor(
         fun onEditItemClick(item: Item)
         fun onWhatChange(what: String)
         fun onWhereChange(where: String)
+        fun onPhotoCaptured(path: String)
         fun onSaveClick(): Boolean
         fun onUpClick()
         fun onDeleteClick()
