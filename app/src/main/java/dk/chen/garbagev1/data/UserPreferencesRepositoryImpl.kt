@@ -22,6 +22,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(@param:ApplicationContex
 
     private object PreferencesKeys {
         val THEME = stringPreferencesKey(name = "theme")
+        val LANGUAGE = stringPreferencesKey(name = "language")
     }
 
     override val theme: Flow<Theme> = context.dataStore.data
@@ -33,6 +34,11 @@ class UserPreferencesRepositoryImpl @Inject constructor(@param:ApplicationContex
             }
         }
 
+    override val language: Flow<String> = context.dataStore.data
+        .map { preferences ->
+            preferences[PreferencesKeys.LANGUAGE] ?: "en"
+        }
+
     override suspend fun setTheme(theme: Theme) {
         // TODO: Map preferences keys to values
         context.dataStore.edit { preferences ->
@@ -41,6 +47,12 @@ class UserPreferencesRepositoryImpl @Inject constructor(@param:ApplicationContex
                 Theme.DARK -> "dark"
                 Theme.SYSTEM -> "system"
             }
+        }
+    }
+
+    override suspend fun setLanguage(language: String) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LANGUAGE] = language
         }
     }
 }

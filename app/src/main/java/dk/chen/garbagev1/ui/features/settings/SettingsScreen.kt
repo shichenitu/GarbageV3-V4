@@ -166,6 +166,7 @@ private fun SettingsScreen(
                             onClick = {
                                 uiEvents.onSetLanguage(language)
                                 languageExpanded = false
+                                activity?.recreate()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                         )
