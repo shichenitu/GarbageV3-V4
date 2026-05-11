@@ -2,6 +2,7 @@ package dk.chen.garbagev1.ui.features.garbage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dk.chen.garbagev1.ui.components.VALID_INPUT_REGEX
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -19,7 +20,9 @@ class AddWhatViewModel : ViewModel() {
 
     val uiEvents: UiEvents = object : UiEvents {
         override fun onWhatChange(what: String) {
-            _uiState.update { it.copy(what = what, isError = false) }
+            if (what.matches(VALID_INPUT_REGEX)) {
+                _uiState.update { it.copy(what = what, isError = false) }
+            }
         }
 
         override fun onNextClick() {

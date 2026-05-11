@@ -15,6 +15,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import dk.chen.garbagev1.R
 
+val VALID_INPUT_REGEX = Regex("^[\\p{L} ]*$")
+
 @Composable
 fun GarbageTextField(
     value: String,

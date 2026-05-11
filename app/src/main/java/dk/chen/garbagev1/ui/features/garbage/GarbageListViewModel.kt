@@ -9,6 +9,7 @@ import dk.chen.garbagev1.domain.Bin
 import dk.chen.garbagev1.domain.BinRepository
 import dk.chen.garbagev1.domain.Item
 import dk.chen.garbagev1.domain.ItemRepository
+import dk.chen.garbagev1.ui.components.VALID_INPUT_REGEX
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -66,11 +67,15 @@ class GarbageListViewModel @Inject constructor(
         }
 
         override fun onWhatChange(what: String) {
-            _uiState.update { it.copy(selectedItem = it.selectedItem?.copy(what = what)) }
+            if (what.matches(VALID_INPUT_REGEX)) {
+                _uiState.update { it.copy(selectedItem = it.selectedItem?.copy(what = what)) }
+            }
         }
 
         override fun onWhereChange(where: String) {
-            _uiState.update { it.copy(selectedItem = it.selectedItem?.copy(where = where)) }
+            if (where.matches(VALID_INPUT_REGEX)) {
+                _uiState.update { it.copy(selectedItem = it.selectedItem?.copy(where = where)) }
+            }
         }
 
         override fun onPhotoCaptured(path: String) {

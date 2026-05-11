@@ -12,6 +12,7 @@ import dk.chen.garbagev1.domain.BinRepository
 import dk.chen.garbagev1.domain.Item
 import dk.chen.garbagev1.domain.ItemRepository
 import dk.chen.garbagev1.ui.components.SnackBarHandler
+import dk.chen.garbagev1.ui.components.VALID_INPUT_REGEX
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -81,11 +82,15 @@ class GarbageSortingViewModel @Inject constructor (
 
     val uiEvents = object : UiEvents {
         override fun onWhatChange(newValue: String) {
-            itemWhat.update { newValue }
+            if (newValue.matches(VALID_INPUT_REGEX)) {
+                itemWhat.update { newValue }
+            }
         }
 
         override fun onWhereChange(newValue: String) {
-            itemWhere.update { newValue }
+            if (newValue.matches(VALID_INPUT_REGEX)) {
+                itemWhere.update { newValue }
+            }
         }
 
         override fun onSearchClick(itemWhat: String) {
