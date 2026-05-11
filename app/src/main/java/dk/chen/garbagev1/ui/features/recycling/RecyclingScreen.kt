@@ -28,6 +28,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -52,14 +53,13 @@ import dk.chen.garbagev1.ui.components.GarbageTopAppBar
 import dk.chen.garbagev1.ui.components.NavigationType
 import dk.chen.garbagev1.R
 import dk.chen.garbagev1.domain.Bin
-import dk.chen.garbagev1.domain.BinCategory
 import dk.chen.garbagev1.domain.RecyclingStation
-import dk.chen.garbagev1.domain.getDisplayNameRes
 import dk.chen.garbagev1.ui.components.BinOrNullProvider
 import dk.chen.garbagev1.ui.components.RequestBackgroundLocationPermission
 import dk.chen.garbagev1.ui.components.ThemedPreviews
 import dk.chen.garbagev1.ui.components.previewBins
 import dk.chen.garbagev1.ui.theme.theme.GarbageV1Theme
+import dk.chen.garbagev1.ui.components.getBinDisplayName
 
 @Serializable
 object Bins : AppRoute
@@ -91,6 +91,7 @@ fun RecyclingScreen(
     BinsScreen(uiState = uiState, uiEvents = viewModel.uiEvents, modifier = modifier)
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BinsScreen(
@@ -99,7 +100,7 @@ private fun BinsScreen(
     modifier: Modifier = Modifier
 ) {
     var filterExpanded by remember { mutableStateOf(false) }
-    var selectedFilterCategory by remember { mutableStateOf<BinCategory?>(null) }
+    var selectedFilterBinName by remember { mutableStateOf<String?>(null) }
 
     if (uiState.showBackgroundPermission) {
         RequestBackgroundLocationPermission(
@@ -167,12 +168,12 @@ private fun BinsScreen(
 
                                 AsyncImage(
                                     model = bin.imageUrl,
-                                    contentDescription = stringResource(bin.getDisplayNameRes()),
+                                    contentDescription = bin.name,
                                     modifier = Modifier.weight(1f),
                                     contentScale = ContentScale.Crop
                                 )
                                 Text(
-                                    text = stringResource(bin.getDisplayNameRes()),
+                                    text = getBinDisplayName(bin.name),
                                     style = MaterialTheme.typography.titleMedium,
                                     modifier = Modifier.padding(8.dp)
                                 )
@@ -210,8 +211,9 @@ private fun BinsScreen(
                         onExpandedChange = { filterExpanded = !filterExpanded },
                         modifier = Modifier.fillMaxWidth()
                     ) {
+                        val filterText = selectedFilterBinName?.let { getBinDisplayName(it) } ?: stringResource(R.string.all_categories)
                         TextField(
-                            value = selectedFilterCategory?.let { stringResource(it.stringRes) } ?: stringResource(R.string.all_categories),
+                            value = filterText,
                             onValueChange = {},
                             readOnly = true,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = filterExpanded) },
@@ -220,23 +222,23 @@ private fun BinsScreen(
                                 .fillMaxWidth()
                         )
 
-                        ExposedDropdownMenu(
+                        DropdownMenu(
                             expanded = filterExpanded,
-                            onDismissRequest = { filterExpanded = false }
+                            onDismissRequest = { filterExpanded = false },
+                            modifier = Modifier.exposedDropdownSize()
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.all_categories)) },
                                 onClick = {
-                                    selectedFilterCategory = null
+                                    selectedFilterBinName = null
                                     filterExpanded = false
                                 }
                             )
                             uiState.bins.forEach { bin ->
-                                val category = BinCategory.fromName(bin.name)
                                 DropdownMenuItem(
-                                    text = { Text(stringResource(bin.getDisplayNameRes())) },
+                                    text = { Text(getBinDisplayName(bin.name)) },
                                     onClick = {
-                                        selectedFilterCategory = category
+                                        selectedFilterBinName = bin.name
                                         filterExpanded = false
                                     }
                                 )
@@ -247,25 +249,22 @@ private fun BinsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            val filteredStations = if (selectedFilterCategory == null) {
+            val filteredStations = if (selectedFilterBinName == null) {
                 uiState.stations
             } else {
                 uiState.stations.filter { station ->
                     val cat = station.category.lowercase()
 
-                    when (selectedFilterCategory) {
-                        BinCategory.BATTERIES, BinCategory.PLASTIC, BinCategory.CARDBOARD,
-                        BinCategory.GLASS, BinCategory.PAPER, BinCategory.METAL,
-                        BinCategory.FOOD, BinCategory.DAILY_WASTE -> {
+                    when (selectedFilterBinName) {
+                        "Batteries", "Plastic", "Cardboard", "Glass", "Paper", "Metal", "Food" , "Daily Waste" -> {
                             cat.contains("nærgenbrugsstation") || cat.contains("genbrugsstation")
                         }
 
-                        BinCategory.ELECTRONICS, BinCategory.BULKY_WASTE, BinCategory.WOOD,
-                        BinCategory.CHEMICAL, BinCategory.TEXTILE_WASTE, BinCategory.OTHER -> {
+                        "Electronics", "Bulky Waste", "Wood", "Chemical","Textile Waste", "Other" -> {
                             cat.contains("genbrugsstation") && !cat.contains("nær")
                         }
 
-                        null -> true
+                        else -> true
                     }
                 }
             }

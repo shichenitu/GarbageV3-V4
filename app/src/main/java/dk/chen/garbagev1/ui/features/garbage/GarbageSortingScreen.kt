@@ -31,11 +31,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dk.chen.garbagev1.domain.Item
 import dk.chen.garbagev1.R
 import dk.chen.garbagev1.domain.Bin
-import dk.chen.garbagev1.domain.BinCategory
 import dk.chen.garbagev1.ui.theme.theme.GarbageV1Theme
+import dk.chen.garbagev1.domain.fullDescription
 import dk.chen.garbagev1.ui.components.GarbageTopAppBar
 import dk.chen.garbagev1.ui.components.GarbageTextField
 import dk.chen.garbagev1.ui.components.NavigationType
+import dk.chen.garbagev1.ui.components.getBinDisplayName
 
 @Composable
 fun GarbageSortingScreen(
@@ -101,7 +102,7 @@ private fun GarbageSortingScreen(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
                     ) {
                         Text(
-                            text = uiState.itemWhere,
+                            text = getBinDisplayName(uiState.itemWhere),
                             style = MaterialTheme.typography.headlineSmall,
                             modifier = Modifier.padding(16.dp)
                         )
@@ -122,11 +123,8 @@ private fun GarbageSortingScreen(
 
                 uiState.sortingList.forEach { item ->
                     item {
-                        val localizedWhere = stringResource(
-                            BinCategory.fromName(item.where)?.stringRes ?: R.string.category_other
-                        )
                         Text(
-                            text = stringResource(R.string.item_placement_format, item.what, localizedWhere),
+                            text = stringResource(R.string.item_placement_format, item.what.lowercase(), getBinDisplayName(item.where)),
                             modifier = Modifier.clickable { uiEvents.onRemoveItemClick(item) }
                         )
                     }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -94,10 +95,10 @@ private fun SettingsScreen(
                         enabled = true
                     )
                 )
-                // TODO: Add an ExposedDropdownMenu & a DropdownMenuItem for each Theme.entries. NB: Theme names needs to be lowercase.
-                ExposedDropdownMenu(
+                DropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.exposedDropdownSize()
                 ) {
                     Theme.entries.forEach { theme ->
                         val itemThemeText = when (theme) {
@@ -113,7 +114,6 @@ private fun SettingsScreen(
                             onClick = {
                                 uiEvents.onSetTheme(theme)
                                 expanded = false
-                                activity?.recreate()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                         )
@@ -151,9 +151,10 @@ private fun SettingsScreen(
                     )
                 )
 
-                ExposedDropdownMenu(
+                DropdownMenu(
                     expanded = languageExpanded,
-                    onDismissRequest = { languageExpanded = false }
+                    onDismissRequest = { languageExpanded = false },
+                    modifier = Modifier.exposedDropdownSize()
                 ) {
                     SettingsViewModel.AppLanguage.entries.forEach { language ->
                         val itemLanguageText = when (language) {
@@ -166,7 +167,6 @@ private fun SettingsScreen(
                             onClick = {
                                 uiEvents.onSetLanguage(language)
                                 languageExpanded = false
-                                activity?.recreate()
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                         )

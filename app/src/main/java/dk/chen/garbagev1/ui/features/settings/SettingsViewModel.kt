@@ -44,7 +44,7 @@ class SettingsViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
-        initialValue = UiState()
+        initialValue = UiState(currentLanguage = getCurrentAppLanguage())
     )
 
     val uiEvents: UiEvents = object : UiEvents {
