@@ -8,9 +8,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dk.chen.garbagev1.R
 import dk.chen.garbagev1.domain.Bin
+import dk.chen.garbagev1.domain.BinCategory
 import dk.chen.garbagev1.domain.BinRepository
 import dk.chen.garbagev1.domain.Item
 import dk.chen.garbagev1.domain.ItemRepository
+import dk.chen.garbagev1.domain.getDisplayNameRes
 import dk.chen.garbagev1.ui.components.SnackBarHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,9 +95,12 @@ class GarbageSortingViewModel @Inject constructor (
                 viewModelScope.launch {
                     val foundItem = sortingList.value.find { it.what.equals(itemWhat, ignoreCase = true) }
                     if (foundItem != null) {
-                        itemWhere.update { "${itemWhat} should be placed in: ${foundItem.where}" }
+                        val localizedWhere = context.getString(
+                            BinCategory.fromName(foundItem.where)?.stringRes ?: R.string.category_other
+                        )
+                        itemWhere.update { context.getString(R.string.item_placement_format, itemWhat, localizedWhere) }
                     } else {
-                        itemWhere.update { "${itemWhat} not found" }
+                        itemWhere.update { context.getString(R.string.textfield_error_message) } // Or a "not found" string if available
                     }
                 }
             } else {
@@ -141,7 +146,8 @@ class GarbageSortingViewModel @Inject constructor (
             viewModelScope.launch {
                 val currentTime = System.currentTimeMillis()
                 binRepository.updateBinPickupTime(bin.name, currentTime)
-                snackBarHandler.postMessage(msg = "${bin.name} recycling tracked!")
+                val localizedBinName = context.getString(bin.getDisplayNameRes())
+                snackBarHandler.postMessage(msg = context.getString(R.string.recycling_tracked_format, localizedBinName))
             }
         }
     }
