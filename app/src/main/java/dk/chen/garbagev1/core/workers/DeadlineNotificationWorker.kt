@@ -8,8 +8,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dk.chen.garbagev1.core.NotificationHelper
 import dk.chen.garbagev1.domain.BinRepository
-import dk.chen.garbagev1.domain.getDisplayNameRes
-import dk.chen.garbagev1.R
 import kotlinx.coroutines.flow.first
 import kotlin.collections.filter
 import kotlin.collections.forEach
@@ -33,11 +31,10 @@ class DeadlineNotificationWorker @AssistedInject constructor(
             }
 
             overdueBins.forEach { bin ->
-                val localizedBinName = applicationContext.getString(bin.getDisplayNameRes())
                 notificationHelper.showNotification(
                     context = applicationContext,
-                    title = applicationContext.getString(R.string.overdue_bin_notification_title),
-                    message = applicationContext.getString(R.string.overdue_bin_notification_message, localizedBinName),
+                    title = "Time to recycle!",
+                    message = "The ${bin.name} bin hasn't been emptied for over 7 days.",
                     notificationId = bin.name.hashCode()
                 )
             }

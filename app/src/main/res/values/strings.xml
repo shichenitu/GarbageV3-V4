@@ -54,9 +54,6 @@
     <string name="theme_system">System</string>
 
     <string name="item_placement_format">%1$s should be placed in %2$s</string>
-    <string name="recycling_tracked_format">%1$s recycling tracked!</string>
-    <string name="overdue_bin_notification_title">Time to recycle!</string>
-    <string name="overdue_bin_notification_message">The %1$s bin hasn\'t been emptied for over 7 days.</string>
 
     <string name="track_recycling">Track Recycling</string>
     <string name="never_emptied">Never emptied</string>

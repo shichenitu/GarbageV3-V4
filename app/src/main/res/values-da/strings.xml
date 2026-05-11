@@ -60,9 +60,6 @@
     <string name="theme_system">Systemstandard</string>
 
     <string name="item_placement_format">%1$s skal sorteres som %2$s</string>
-    <string name="recycling_tracked_format">%1$s tømning registreret!</string>
-    <string name="overdue_bin_notification_title">Tid til at genbruge!</string>
-    <string name="overdue_bin_notification_message">%1$s beholderen er ikke blevet tømt i over 7 dage.</string>
     <string name="track_recycling">Spor genbrug</string>
     <string name="never_emptied">Aldrig tømt</string>
 

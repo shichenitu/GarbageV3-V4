@@ -52,9 +52,7 @@ import dk.chen.garbagev1.ui.components.GarbageTopAppBar
 import dk.chen.garbagev1.ui.components.NavigationType
 import dk.chen.garbagev1.R
 import dk.chen.garbagev1.domain.Bin
-import dk.chen.garbagev1.domain.BinCategory
 import dk.chen.garbagev1.domain.RecyclingStation
-import dk.chen.garbagev1.domain.getDisplayNameRes
 import dk.chen.garbagev1.ui.components.BinOrNullProvider
 import dk.chen.garbagev1.ui.components.RequestBackgroundLocationPermission
 import dk.chen.garbagev1.ui.components.ThemedPreviews
@@ -99,7 +97,7 @@ private fun BinsScreen(
     modifier: Modifier = Modifier
 ) {
     var filterExpanded by remember { mutableStateOf(false) }
-    var selectedFilterCategory by remember { mutableStateOf<BinCategory?>(null) }
+    var selectedFilterBinName by remember { mutableStateOf<String?>(null) }
 
     if (uiState.showBackgroundPermission) {
         RequestBackgroundLocationPermission(
@@ -167,12 +165,12 @@ private fun BinsScreen(
 
                                 AsyncImage(
                                     model = bin.imageUrl,
-                                    contentDescription = stringResource(bin.getDisplayNameRes()),
+                                    contentDescription = bin.name,
                                     modifier = Modifier.weight(1f),
                                     contentScale = ContentScale.Crop
                                 )
                                 Text(
-                                    text = stringResource(bin.getDisplayNameRes()),
+                                    text = bin.name,
                                     style = MaterialTheme.typography.titleMedium,
                                     modifier = Modifier.padding(8.dp)
                                 )
@@ -211,7 +209,7 @@ private fun BinsScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         TextField(
-                            value = selectedFilterCategory?.let { stringResource(it.stringRes) } ?: stringResource(R.string.all_categories),
+                            value = selectedFilterBinName ?: stringResource(R.string.all_categories),
                             onValueChange = {},
                             readOnly = true,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = filterExpanded) },
@@ -227,16 +225,15 @@ private fun BinsScreen(
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.all_categories)) },
                                 onClick = {
-                                    selectedFilterCategory = null
+                                    selectedFilterBinName = null
                                     filterExpanded = false
                                 }
                             )
                             uiState.bins.forEach { bin ->
-                                val category = BinCategory.fromName(bin.name)
                                 DropdownMenuItem(
-                                    text = { Text(stringResource(bin.getDisplayNameRes())) },
+                                    text = { Text(bin.name) },
                                     onClick = {
-                                        selectedFilterCategory = category
+                                        selectedFilterBinName = bin.name
                                         filterExpanded = false
                                     }
                                 )
@@ -247,25 +244,22 @@ private fun BinsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            val filteredStations = if (selectedFilterCategory == null) {
+            val filteredStations = if (selectedFilterBinName == null) {
                 uiState.stations
             } else {
                 uiState.stations.filter { station ->
                     val cat = station.category.lowercase()
 
-                    when (selectedFilterCategory) {
-                        BinCategory.BATTERIES, BinCategory.PLASTIC, BinCategory.CARDBOARD,
-                        BinCategory.GLASS, BinCategory.PAPER, BinCategory.METAL,
-                        BinCategory.FOOD, BinCategory.DAILY_WASTE -> {
+                    when (selectedFilterBinName) {
+                        "Batteries", "Plastic", "Cardboard", "Glass", "Paper", "Metal", "Food" , "Daily Waste" -> {
                             cat.contains("nærgenbrugsstation") || cat.contains("genbrugsstation")
                         }
 
-                        BinCategory.ELECTRONICS, BinCategory.BULKY_WASTE, BinCategory.WOOD,
-                        BinCategory.CHEMICAL, BinCategory.TEXTILE_WASTE, BinCategory.OTHER -> {
+                        "Electronics", "Bulky Waste", "Wood", "Chemical","Textile Waste", "Other" -> {
                             cat.contains("genbrugsstation") && !cat.contains("nær")
                         }
 
-                        null -> true
+                        else -> true
                     }
                 }
             }
