@@ -28,6 +28,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -58,6 +59,7 @@ import dk.chen.garbagev1.ui.components.RequestBackgroundLocationPermission
 import dk.chen.garbagev1.ui.components.ThemedPreviews
 import dk.chen.garbagev1.ui.components.previewBins
 import dk.chen.garbagev1.ui.theme.theme.GarbageV1Theme
+import dk.chen.garbagev1.ui.components.getBinDisplayName
 
 @Serializable
 object Bins : AppRoute
@@ -88,6 +90,7 @@ fun RecyclingScreen(
     val uiState by viewModel.uiState.collectAsState()
     BinsScreen(uiState = uiState, uiEvents = viewModel.uiEvents, modifier = modifier)
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -170,7 +173,7 @@ private fun BinsScreen(
                                     contentScale = ContentScale.Crop
                                 )
                                 Text(
-                                    text = bin.name,
+                                    text = getBinDisplayName(bin.name),
                                     style = MaterialTheme.typography.titleMedium,
                                     modifier = Modifier.padding(8.dp)
                                 )
@@ -208,8 +211,9 @@ private fun BinsScreen(
                         onExpandedChange = { filterExpanded = !filterExpanded },
                         modifier = Modifier.fillMaxWidth()
                     ) {
+                        val filterText = selectedFilterBinName?.let { getBinDisplayName(it) } ?: stringResource(R.string.all_categories)
                         TextField(
-                            value = selectedFilterBinName ?: stringResource(R.string.all_categories),
+                            value = filterText,
                             onValueChange = {},
                             readOnly = true,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = filterExpanded) },
@@ -218,9 +222,10 @@ private fun BinsScreen(
                                 .fillMaxWidth()
                         )
 
-                        ExposedDropdownMenu(
+                        DropdownMenu(
                             expanded = filterExpanded,
-                            onDismissRequest = { filterExpanded = false }
+                            onDismissRequest = { filterExpanded = false },
+                            modifier = Modifier.exposedDropdownSize()
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.all_categories)) },
@@ -231,7 +236,7 @@ private fun BinsScreen(
                             )
                             uiState.bins.forEach { bin ->
                                 DropdownMenuItem(
-                                    text = { Text(bin.name) },
+                                    text = { Text(getBinDisplayName(bin.name)) },
                                     onClick = {
                                         selectedFilterBinName = bin.name
                                         filterExpanded = false

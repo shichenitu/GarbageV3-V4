@@ -35,10 +35,11 @@ class SettingsViewModel @Inject constructor(
     val uiState: StateFlow<UiState> = combine(
         userPreferencesRepository.theme,
         userPreferencesRepository.language
-    ) { theme, _ ->
+    ) { theme, languageTag ->
+        val appLanguage = AppLanguage.entries.find { it.tag == languageTag } ?: AppLanguage.ENGLISH
         UiState(
             theme = theme,
-            currentLanguage = getCurrentAppLanguage()
+            currentLanguage = appLanguage
         )
     }.stateIn(
         scope = viewModelScope,

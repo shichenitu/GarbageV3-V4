@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import dk.chen.garbagev1.domain.Bin
 import dk.chen.garbagev1.ui.components.BinProvider
 import dk.chen.garbagev1.ui.components.ThemedPreviews
+import dk.chen.garbagev1.ui.components.getBinDisplayName
 import dk.chen.garbagev1.ui.theme.theme.GarbageV1Theme
 import kotlinx.coroutines.launch
 import androidx.compose.material3.Button
@@ -55,7 +56,7 @@ fun BinDetailsSheet(
                 .padding(all = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = bin.name, style = MaterialTheme.typography.headlineMedium)
+            Text(text = getBinDisplayName(bin.name), style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.height(height = 16.dp))
             Text(
                 text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
