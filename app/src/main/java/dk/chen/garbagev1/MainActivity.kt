@@ -30,27 +30,8 @@ import android.os.Bundle
 import android.util.Log
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
-    override fun attachBaseContext(newBase: Context) {
-        val locales = AppCompatDelegate.getApplicationLocales()
-        Log.d("MainActivityLocale", "attachBaseContext locales: ${locales.toLanguageTags()}")
-        if (!locales.isEmpty) {
-            val config = Configuration(newBase.resources.configuration)
-            config.setLocales(LocaleList.forLanguageTags(locales.toLanguageTags()))
-            super.attachBaseContext(newBase.createConfigurationContext(config))
-            applyOverrideConfiguration(config)
-        } else {
-            super.attachBaseContext(newBase)
-        }
-    }
-
+class MainActivity : androidx.appcompat.app.AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val locales = AppCompatDelegate.getApplicationLocales()
-        if (!locales.isEmpty) {
-            val config = Configuration(resources.configuration)
-            config.setLocales(LocaleList.forLanguageTags(locales.toLanguageTags()))
-            applyOverrideConfiguration(config)
-        }
         super.onCreate(savedInstanceState)
         Log.d("MainActivityLocale", "onCreate locales: ${AppCompatDelegate.getApplicationLocales().toLanguageTags()}")
         Log.d("MainActivityLocale", "onCreate config locales: ${resources.configuration.locales.toLanguageTags()}")
@@ -78,18 +59,6 @@ class MainActivity : ComponentActivity() {
                 Theme.SYSTEM -> isSystemInDarkTheme()
             }
 
-            val currentLanguage = uiState.currentLanguage
-            val context = androidx.compose.ui.platform.LocalContext.current
-            val currentConfig = androidx.compose.ui.platform.LocalConfiguration.current
-            val composeConfig = android.content.res.Configuration(currentConfig)
-            composeConfig.setLocales(android.os.LocaleList.forLanguageTags(currentLanguage.tag))
-            
-            val localizedContext = object : android.content.ContextWrapper(context) {
-                override fun getResources(): android.content.res.Resources {
-                    return context.createConfigurationContext(composeConfig).resources
-                }
-            }
-
             // We call enableEdgeToEdge here, inside setContent, to recompose when the theme changes.
             // This ensures the status and navigation bar colors update dynamically.
             // The SystemBarStyle.auto() constructor requires us to explicitly provide the scrim
@@ -115,18 +84,13 @@ class MainActivity : ComponentActivity() {
                 ) { darkTheme },
             )
 
-            androidx.compose.runtime.CompositionLocalProvider(
-                androidx.compose.ui.platform.LocalContext provides localizedContext,
-                androidx.compose.ui.platform.LocalConfiguration provides composeConfig
-            ) {
-                GarbageV1Theme() {
-                    RequestNotificationPermission()
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        MainNavigation()
-                    }
+            GarbageV1Theme() {
+                RequestNotificationPermission()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MainNavigation()
                 }
             }
         }

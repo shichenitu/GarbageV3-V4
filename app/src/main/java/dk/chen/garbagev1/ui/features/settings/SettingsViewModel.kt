@@ -35,16 +35,15 @@ class SettingsViewModel @Inject constructor(
     val uiState: StateFlow<UiState> = combine(
         userPreferencesRepository.theme,
         userPreferencesRepository.language
-    ) { theme, languageTag ->
-        val appLanguage = AppLanguage.entries.find { it.tag == languageTag } ?: AppLanguage.ENGLISH
+    ) { theme, _ ->
         UiState(
             theme = theme,
-            currentLanguage = appLanguage
+            currentLanguage = getCurrentAppLanguage()
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
-        initialValue = UiState()
+        initialValue = UiState(currentLanguage = getCurrentAppLanguage())
     )
 
     val uiEvents: UiEvents = object : UiEvents {
