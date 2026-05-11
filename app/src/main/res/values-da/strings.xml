@@ -60,10 +60,32 @@
     <string name="theme_system">Systemstandard</string>
 
     <string name="item_placement_format">%1$s skal sorteres som %2$s</string>
+    <string name="recycling_tracked_format">%1$s tømning registreret!</string>
+    <string name="overdue_bin_notification_title">Tid til at genbruge!</string>
+    <string name="overdue_bin_notification_message">%1$s beholderen er ikke blevet tømt i over 7 dage.</string>
     <string name="track_recycling">Spor genbrug</string>
     <string name="never_emptied">Aldrig tømt</string>
 
     <string name="all_categories">Alle kategorier</string>
+
+    <string name="time_elapsed_days">%1$dd %2$dt siden</string>
+    <string name="time_elapsed_hours">%1$dt %2$dm siden</string>
+    <string name="just_now">Lige nu</string>
+
+    <string name="category_batteries">Batterier</string>
+    <string name="category_plastic">Plast</string>
+    <string name="category_cardboard">Pap</string>
+    <string name="category_glass">Glas</string>
+    <string name="category_paper">Papir</string>
+    <string name="category_metal">Metal</string>
+    <string name="category_food">Madaffald</string>
+    <string name="category_daily_waste">Restaffald</string>
+    <string name="category_electronics">Elektronik</string>
+    <string name="category_bulky_waste">Stort affald</string>
+    <string name="category_wood">Træ</string>
+    <string name="category_chemical">Kemikalier</string>
+    <string name="category_textile_waste">Tekstilaffald</string>
+    <string name="category_other">Andet</string>
 
     <string name="language_label">Sprog</string>
 
