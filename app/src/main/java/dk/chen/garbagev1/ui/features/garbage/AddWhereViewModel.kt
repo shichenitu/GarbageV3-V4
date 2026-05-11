@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dk.chen.garbagev1.domain.Item
 import dk.chen.garbagev1.domain.ItemRepository
+import dk.chen.garbagev1.ui.components.VALID_INPUT_REGEX
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -32,7 +33,9 @@ class AddWhereViewModel @Inject constructor(
 
     val uiEvents: UiEvents = object : UiEvents {
         override fun onWhereChange(where: String) {
-            _uiState.update { it.copy(where = where, isError = false) }
+            if (where.matches(VALID_INPUT_REGEX)) {
+                _uiState.update { it.copy(where = where, isError = false) }
+            }
         }
 
         override fun onDoneClick() {
