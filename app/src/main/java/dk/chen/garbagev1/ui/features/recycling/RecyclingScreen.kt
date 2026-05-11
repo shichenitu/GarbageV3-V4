@@ -62,9 +62,11 @@ import dk.chen.garbagev1.ui.theme.theme.GarbageV1Theme
 @Serializable
 object Bins : AppRoute
 
+@Composable
 fun formatTimeElapsed(lastPickupTime: Long): String? {
     if (lastPickupTime == 0L) return null
 
+    val context = androidx.compose.ui.platform.LocalContext.current
     val diff = System.currentTimeMillis() - lastPickupTime
     val seconds = diff / 1000
     val minutes = seconds / 60
@@ -72,9 +74,9 @@ fun formatTimeElapsed(lastPickupTime: Long): String? {
     val days = hours / 24
 
     return when {
-        days > 0 -> "${days}d ${hours % 24}h ago"
-        hours > 0 -> "${hours}h ${minutes % 60}m ago"
-        else -> "Just now"
+        days > 0 -> context.getString(R.string.time_elapsed_days, days.toInt(), (hours % 24).toInt())
+        hours > 0 -> context.getString(R.string.time_elapsed_hours, hours.toInt(), (minutes % 60).toInt())
+        else -> context.getString(R.string.just_now)
     }
 }
 
@@ -207,7 +209,7 @@ private fun BinsScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         TextField(
-                            value = selectedFilterBinName ?: "All Categories",
+                            value = selectedFilterBinName ?: stringResource(R.string.all_categories),
                             onValueChange = {},
                             readOnly = true,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = filterExpanded) },
